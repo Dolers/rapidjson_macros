@@ -1,0 +1,11 @@
+find_package(RapidJSON REQUIRED)
+
+add_executable(bench_rapidjson_macros bench_member_traits.cpp)
+target_include_directories(bench_rapidjson_macros PRIVATE "../../include")
+target_link_libraries(bench_rapidjson_macros rapidjson_macros rapidjson Catch2::Catch2WithMain)
+target_compile_definitions(bench_rapidjson_macros PRIVATE RAPIDJSON_HAS_STDSTRING)
+
+add_executable(bench_rapidjson_macroless bench_member_traits_macroless.cpp)
+target_include_directories(bench_rapidjson_macroless PRIVATE "../../include")
+target_link_libraries(bench_rapidjson_macroless rapidjson_macros rapidjson Catch2::Catch2WithMain)
+target_compile_definitions(bench_rapidjson_macroless PRIVATE RAPIDJSON_HAS_STDSTRING)

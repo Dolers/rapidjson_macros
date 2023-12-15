@@ -1,0 +1,6 @@
+#pragma once
+
+#include <rapidjson_macros/details/rapidjson_macros.hpp>
+#include <rapidjson_macros/details/vector.hpp>
+#include <rapidjson_macros/details/map.hpp>
+#include <rapidjson_macros/details/collections.hpp>

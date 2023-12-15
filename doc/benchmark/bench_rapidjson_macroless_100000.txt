@@ -1,0 +1,58 @@
+Randomness seeded to: 1875075408
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bench_rapidjson_macroless.exe is a Catch2 v3.4.0 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use as()
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits_macroless.cpp(108)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::as                       100000             8      1.6864 s 
+                                         2.1016 us    2.10043 us    2.10289 us 
+                                        199.017 ns     188.05 ns    213.051 ns 
+                                                                               
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use to_json()
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits_macroless.cpp(130)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::as                       100000            41      1.6441 s 
+                                        404.406 ns    404.195 ns     404.67 ns 
+                                        38.0326 ns     32.767 ns    48.6608 ns 
+                                                                               
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use to_stream(std::ostream)
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits_macroless.cpp(149)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::to_stream                100000             5      1.9805 s 
+                                        4.54621 us    4.54429 us    4.54827 us 
+                                        319.301 ns    302.705 ns    339.249 ns 
+                                                                               
+
+===============================================================================
+test cases: 1 | 1 passed
+assertions: - none -
+

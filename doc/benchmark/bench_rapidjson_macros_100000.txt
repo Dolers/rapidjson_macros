@@ -1,0 +1,58 @@
+Randomness seeded to: 1041096442
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bench_rapidjson_macros.exe is a Catch2 v3.4.0 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use as()
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits.cpp(17)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::as                       100000             9      1.7424 s 
+                                        1.96072 us    1.95954 us      1.962 us 
+                                        198.255 ns    185.784 ns    213.498 ns 
+                                                                               
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use to_json()
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits.cpp(39)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::as                       100000            40       1.628 s 
+                                        405.002 ns    404.823 ns    405.193 ns 
+                                        29.8032 ns    28.1448 ns    31.6027 ns 
+                                                                               
+
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS
+  Can use to_stream(std::ostream)
+-------------------------------------------------------------------------------
+C:\projects\rapidjson_macros\test\src\bench\bench_member_traits.cpp(58)
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+ALL_MEMBER_TRAITS::to_stream                100000             5       1.951 s 
+                                        4.49065 us    4.48876 us     4.4927 us 
+                                          315.8 ns    298.388 ns    342.216 ns 
+                                                                               
+
+===============================================================================
+test cases: 1 | 1 passed
+assertions: - none -
+
