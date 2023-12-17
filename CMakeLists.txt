@@ -28,6 +28,8 @@ target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${PROJECT
 OPTION(RAPIDJSON_MACROS_BUILD_TESTS "Build rapidjson_macros test suite" ON)
 
 if(RAPIDJSON_MACROS_BUILD_TESTS)
+    enable_testing()
+    include(CTest)
     add_subdirectory(test)
 endif()
 

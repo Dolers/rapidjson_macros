@@ -1,9 +1,6 @@
 find_package(Catch2 REQUIRED)
 find_package(RapidJSON REQUIRED)
 
-include(CTest)
-enable_testing()
-
 add_executable(test_rapidjson_macros
     src/test_enum_traits.cpp
     src/test_member_traits.cpp
