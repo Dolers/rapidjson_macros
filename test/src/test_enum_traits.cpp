@@ -9,13 +9,14 @@
 #include <test_enum_traits.hpp>
 
 #include <sstream>
+#include <algorithm>
 
 RAPIDJSON_ENUM_TRAITS(enum_class, ZERO, ONE, TWO)
 RAPIDJSON_ENUM_NAME_TRAITS(enum_class_named, (ZERO_NAME, "zero"), (ONE_NAME, "one"), (TWO_NAME, "two"))
 
 using namespace rapidjson_macros;
 
-TEMPLATE_TEST_CASE_SIG("ENUM_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("ENUM_TRAITS", "[ENUM]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     SECTION("Can use as()", "[as]")
     {
@@ -50,7 +51,7 @@ TEMPLATE_TEST_CASE_SIG("ENUM_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rap
     }
     SECTION("Can use to_stream()", "[to_stream]")
     {
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         SECTION("with enum_class::ZERO")
         {
@@ -70,7 +71,7 @@ TEMPLATE_TEST_CASE_SIG("ENUM_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rap
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("ENUM_NAME_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("ENUM_NAME_TRAITS", "[ENUM]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     SECTION("Can use as()", "[as]")
     {
@@ -113,7 +114,7 @@ TEMPLATE_TEST_CASE_SIG("ENUM_NAME_TRAITS", "", (typename Enc), rapidjson::UTF8<>
     }
     SECTION("Can use to_stream()", "[to_stream]")
     {
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         SECTION("with enum_class_named::ZERO_NAME")
         {

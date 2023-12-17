@@ -3,11 +3,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_template_test_macros.hpp>
+
 #include <rapidjson_macros/rapidjson_macros>
 #include <test_utility.hpp>
-
 #include <test_member_traits.hpp>
+
 #include <sstream>
+#include <algorithm>
 
 RAPIDJSON_ALL_MEMBER_TRAITS(all_member_trait_class, my_bool, my_int32, my_int64, my_string, my_vector, my_array, my_map, my_dict, my_set);
 RAPIDJSON_N_MEMBER_TRAITS(n_member_trait_class, 4, my_bool, my_uint32, my_uint64, my_string, my_list, my_array, my_map, my_dict, my_set);
@@ -15,7 +17,7 @@ RAPIDJSON_TPL_ALL_MEMBER_TRAITS(3, tpl_all_member_trait_class, my_type1, my_type
 RAPIDJSON_TPL_N_MEMBER_TRAITS(3, tpl_n_member_trait_class, 2, my_type1, my_type2, my_type3);
 
 using namespace rapidjson_macros;
-TEMPLATE_TEST_CASE_SIG("ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("ALL_MEMBER_TRAITS", "[ALL][MEMBER]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     SECTION("Can use as()", "[as]")
     {
@@ -157,11 +159,11 @@ TEMPLATE_TEST_CASE_SIG("ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<
         val.my_dict = {{"traitor", "serpent"}, {"battle-brother", "legion"}};
         val.my_set = {0, -5, 10};
 
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         to_stream<all_member_trait_class, Enc>(ss, val);
         auto value = ss.str();
-        std::basic_string<Enc::Ch> output = STR_LITERAL(R"(
+        std::basic_string<typename Enc::Ch> output = STR_LITERAL(R"(
                     {
                         "my_bool": true,
                         "my_int32": -1234,
@@ -177,13 +179,13 @@ TEMPLATE_TEST_CASE_SIG("ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<
                         "my_set": [-5,0,10]
                     }
                 )");
-        output.erase(std::remove_if(output.begin(), output.end(), std::isspace), output.end());
+        output.erase(std::remove_if(output.begin(), output.end(), test::space<typename Enc::Ch>::check), output.end());
 
         CHECK(value == output);
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "[N][MEMBER]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     SECTION("Can use as()", "[as]")
     {
@@ -223,7 +225,7 @@ TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>,
                             "battle-brother": "legion",
                             "traitor": "serpent"
                         },
-                        "my_set": [0,5,10]
+                        "my_set": [2,5,10]
                     }
                 )"));
 
@@ -249,7 +251,7 @@ TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>,
             CHECK(val.my_dict["battle-brother"] == "legion");
 
             CHECK(val.my_set.size() == 3);
-            CHECK(val.my_set.count(0) == 1);
+            CHECK(val.my_set.count(2) == 1);
             CHECK(val.my_set.count(5) == 1);
             CHECK(val.my_set.count(10) == 1);
         }
@@ -323,7 +325,7 @@ TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>,
         val.my_array = {0, 1};
         val.my_map = {{0, "Human"}, {1, "God"}};
         val.my_dict = {{"traitor", "serpent"}, {"battle-brother", "legion"}};
-        val.my_set = {0, 5, 10};
+        val.my_set = {2, 5, 10};
 
         auto json = to_json<n_member_trait_class, Enc>(val, doc.GetAllocator());
         REQUIRE_FALSE(json.IsNull());
@@ -352,23 +354,33 @@ TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>,
         CHECK(json[STR_LITERAL("my_array")].GetArray()[1] == 1);
 
         REQUIRE(json.HasMember(STR_LITERAL("my_map")));
-        CHECK(json[STR_LITERAL("my_map")].GetArray()[0].GetArray()[0].GetInt() == 0);
-        CHECK(test::compare_cstring(json[STR_LITERAL("my_map")].GetArray()[0].GetArray()[1], STR_LITERAL("Human")));
-        CHECK(json[STR_LITERAL("my_map")].GetArray()[1].GetArray()[0].GetInt() == 1);
-        CHECK(test::compare_cstring(json[STR_LITERAL("my_map")].GetArray()[1].GetArray()[1], STR_LITERAL("God")));
+        auto map = json[STR_LITERAL("my_map")].GetArray();
+
+        CHECK(map.Size() == 2);
+        CHECK(test::array_contains<Enc>(map, [](auto it) {
+            return it->GetArray()[0].GetInt() == 0 &&
+                   test::compare_cstring(it->GetArray()[1], STR_LITERAL("Human"));
+        }));
+        CHECK(test::array_contains<Enc>(map, [](auto it) {
+            return it->GetArray()[0].GetInt() == 1 &&
+                   test::compare_cstring(it->GetArray()[1], STR_LITERAL("God"));
+        }));
 
         REQUIRE(json.HasMember(STR_LITERAL("my_dict")));
         CHECK(test::compare_cstring(json[STR_LITERAL("my_dict")][STR_LITERAL("battle-brother")], STR_LITERAL("legion")));
         CHECK(test::compare_cstring(json[STR_LITERAL("my_dict")][STR_LITERAL("traitor")], STR_LITERAL("serpent")));
 
         REQUIRE(json.HasMember(STR_LITERAL("my_set")));
-        CHECK(json[STR_LITERAL("my_set")].GetArray()[0] == 0);
-        CHECK(json[STR_LITERAL("my_set")].GetArray()[1] == 5);
-        CHECK(json[STR_LITERAL("my_set")].GetArray()[2] == 10);
+        auto set = json[STR_LITERAL("my_set")].GetArray();
+
+        CHECK(set.Size() == 3);
+        CHECK(test::array_contains<Enc>(set, [](auto it) { return *it == 2; }));
+        CHECK(test::array_contains<Enc>(set, [](auto it) { return *it == 5; }));
+        CHECK(test::array_contains<Enc>(set, [](auto it) { return *it == 10; }));
     }
     SECTION("Can use to_stream(std::ostream)", "[to_stream]")
     {
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         n_member_trait_class val;
         val.my_bool = false;
@@ -379,33 +391,49 @@ TEMPLATE_TEST_CASE_SIG("N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>,
         val.my_array = {0, 1};
         val.my_map = {{0, "Human"}, {1, "God"}};
         val.my_dict = {{"battle-brother", "legion"}, {"traitor", "serpent"}};
-        val.my_set = {0, 5, 10};
+        val.my_set = {2, 5, 10};
 
         to_stream<n_member_trait_class, Enc>(ss, val);
         auto value = ss.str();
-        std::basic_string<Enc::Ch> output = STR_LITERAL(R"(
-            {
-                "my_bool": false,
-                "my_uint32": 1234,
-                "my_uint64": 5678,
-                "my_string": "Lupercal",
-                "my_list": [10.0,20.0,30.0,40.0],
-                "my_array": [0,1],
-                "my_map": [[0,"Human"],[1,"God"]],
-                "my_dict": {
-                    "battle-brother": "legion",
-                    "traitor": "serpent"                            
-                },
-                "my_set": [0,5,10]
-            }
-        )");
-        output.erase(std::remove_if(output.begin(), output.end(), std::isspace), output.end());
 
-        CHECK(value == output);
+        using AnyString = std::basic_string<typename Enc::Ch>;
+        AnyString output = STR_LITERAL(R"(
+                {
+                    "my_bool": false,
+                    "my_uint32": 1234,
+                    "my_uint64": 5678,
+                    "my_string": "Lupercal",
+                    "my_list": [10.0,20.0,30.0,40.0],
+                    "my_array": [0,1],
+            )");
+        output.erase(std::remove_if(output.begin(), output.end(), test::space<typename Enc::Ch>::check), output.end());
+
+        // unordered type does not guaranteed to have the same order
+        // regex is not implemented for char32_t
+
+        auto currPos = value.find(output);
+        CHECK(currPos != AnyString::npos);
+
+        currPos = value.find(STR_LITERAL(R"("my_map":)"), currPos);
+        CHECK(currPos != AnyString::npos);
+        CHECK(value.find(STR_LITERAL(R"([0,"Human"])"), currPos) != AnyString::npos);
+        CHECK(value.find(STR_LITERAL(R"([1,"God"])"), currPos) != AnyString::npos);
+
+        currPos = value.find(STR_LITERAL(R"("my_dict":)"), currPos);
+        CHECK(currPos != AnyString::npos);
+        CHECK(value.find(STR_LITERAL(R"("traitor":"serpent")"), currPos) != AnyString::npos);
+        CHECK(value.find(STR_LITERAL(R"("battle-brother":"legion")"), currPos) != AnyString::npos);
+
+        currPos = value.find(STR_LITERAL(R"("my_set":)"), currPos);
+        CHECK(value.find(STR_LITERAL("2"), currPos) != AnyString::npos);
+        CHECK(value.find(STR_LITERAL("5"), currPos) != AnyString::npos);
+        CHECK(value.find(STR_LITERAL("10"), currPos) != AnyString::npos);
+
+        CHECK(value.find(STR_LITERAL("}"), currPos) != AnyString::npos);
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("TPL_ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("TPL_ALL_MEMBER_TRAITS", "[TPL][ALL][MEMBER]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     using tpl_all_member_trait_class_isv = tpl_all_member_trait_class<int32_t, std::string, std::vector<float>>;
 
@@ -465,7 +493,7 @@ TEMPLATE_TEST_CASE_SIG("TPL_ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::U
 
     SECTION("Can use to_stream(std::ostream)", "[to_stream]")
     {
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         tpl_all_member_trait_class_isv val;
         val.my_type1 = 162;
@@ -474,20 +502,20 @@ TEMPLATE_TEST_CASE_SIG("TPL_ALL_MEMBER_TRAITS", "", (typename Enc), rapidjson::U
 
         to_stream<tpl_all_member_trait_class_isv, Enc>(ss, val);
         auto value = ss.str();
-        std::basic_string<Enc::Ch> output = STR_LITERAL(R"(
+        std::basic_string<typename Enc::Ch> output = STR_LITERAL(R"(
                 {
                     "my_type1": 162,
                     "my_type2": "Davin's_moon",
                     "my_type3": [45.099998474121097,55.5]
                 }
             )");
-        output.erase(std::remove_if(output.begin(), output.end(), std::isspace), output.end());
+        output.erase(std::remove_if(output.begin(), output.end(), test::space<typename Enc::Ch>::check), output.end());
 
         CHECK(value == output);
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("TPL_N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
+TEMPLATE_TEST_CASE_SIG("TPL_N_MEMBER_TRAITS", "[TPL][N][MEMBER]", (typename Enc), rapidjson::UTF8<>, rapidjson::UTF16<>, rapidjson::UTF16LE<>, rapidjson::UTF16BE<>, rapidjson::UTF32<char32_t>, rapidjson::UTF32<unsigned>)
 {
     using tpl_n_member_trait_class_isv = tpl_n_member_trait_class<int32_t, std::string, std::list<float>>;
 
@@ -565,7 +593,7 @@ TEMPLATE_TEST_CASE_SIG("TPL_N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF
 
     SECTION("Can use to_stream(std::ostream)", "[to_stream]")
     {
-        std::basic_stringstream<Enc::Ch> ss;
+        std::basic_stringstream<typename Enc::Ch> ss;
 
         tpl_n_member_trait_class_isv val;
         val.my_type1 = 162;
@@ -574,14 +602,14 @@ TEMPLATE_TEST_CASE_SIG("TPL_N_MEMBER_TRAITS", "", (typename Enc), rapidjson::UTF
 
         to_stream<tpl_n_member_trait_class_isv, Enc>(ss, val);
         auto value = ss.str();
-        std::basic_string<Enc::Ch> output = STR_LITERAL(R"(
+        std::basic_string<typename Enc::Ch> output = STR_LITERAL(R"(
                 {
                     "my_type1": 162,
                     "my_type2": "Davin's_moon",
                     "my_type3": [45.099998474121097,55.5]
                 }
             )");
-        output.erase(std::remove_if(output.begin(), output.end(), std::isspace), output.end());
+        output.erase(std::remove_if(output.begin(), output.end(), test::space<typename Enc::Ch>::check), output.end());
 
         CHECK(value == output);
     }

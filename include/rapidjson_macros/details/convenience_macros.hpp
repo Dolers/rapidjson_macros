@@ -161,7 +161,7 @@
 
 #define RAPIDJSON_GENERATE_TPL_PARAMS(Call, Count) RAPIDJSON_REP_OF_N(Call, , , , Count)
 #define RAPIDJSON_GENERATE_TPL_ARGS(Call, Count) RAPIDJSON_REP_OF_N(Call, , <, >, Count)
-#define RAPIDJSON_GENERATE_TPL_SPECIALIZE(Call, Count) RAPIDJSON_REP_OF_N(Call, , template<, >, Count)
+#define RAPIDJSON_GENERATE_TPL_SPECIALIZE(Call, Count) RAPIDJSON_REP_OF_N(Call, , template <, >, Count)
 #define RAPIDJSON_GENERATE_TPL_PARAM(Expr, Id) typename T##Id,
 #define RAPIDJSON_GENERATE_TPL_PARAM_LAST(Expr, Id) typename T##Id
 #define RAPIDJSON_GENERATE_MORE_TPL_PARAM(Expr, Id) , typename T##Id
@@ -220,25 +220,25 @@
 // This variant with a little comp-optimization will result in +1 ASM call than the rest of the types, despite the vast amount of code
 #define RAPIDJSON_GENERATE_NAME_STR_UNSIGNED_DECLARE(ValueType, NumTemplateParams, Prefix, Member, Count) RAPIDJSON_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, Prefix, Member, Count)
 #define RAPIDJSON_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, Prefix, Member, Count) \
-    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams) \
-    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::##Prefix##Member##_str = (unsigned*)RAPIDJSON_QUOTE(U, Member);
+    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams)                         \
+    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::Prefix##Member##_str = (unsigned*)RAPIDJSON_QUOTE(U, Member);
 
 #define RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE(ValueType, NumTemplateParams, P3, Seq, Count) RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, P3, Seq, Count)
 #define RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, P3, Seq, Count) \
-    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams) \
-    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::##RAPIDJSON_EXPAND(RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_ Seq)
+    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams)                                     \
+    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::RAPIDJSON_EXPAND(RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_ Seq)
 #define RAPIDJSON_GETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_(Getter, Name) \
     Getter##_str = (unsigned*)U##Name;
 
 #define RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE(ValueType, NumTemplateParams, P3, Seq, Count) RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, P3, Seq, Count)
 #define RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_LAST(ValueType, NumTemplateParams, P3, Seq, Count) \
-    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams) \
-    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::##RAPIDJSON_EXPAND(RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_ Seq)
+    RAPIDJSON_GENERATE_TPL_SPECIALIZE(RAPIDJSON_GENERATE_TPL_PARAM, NumTemplateParams)                                            \
+    const unsigned* json_traits_macro_names<ValueType RAPIDJSON_GENERATE_TPL_ARGS(RAPIDJSON_GENERATE_TPL_ARG, NumTemplateParams), unsigned>::RAPIDJSON_EXPAND(RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_ Seq)
 #define RAPIDJSON_GETTER_SETTER_NAME_TRAITS_GENERATE_NAME_STR_UNSIGNED_DECLARE_(Getter, Setter, Name) \
     Getter##_str = (unsigned*)U##Name;
 
 #ifdef RAPIDJSON_USE_VOLATILE
-#define RAPIDJSON_VOLATILE(Member) const_cast<std::decay<decltype(value_type::Member)>::type&>(obj.Member)
+#define RAPIDJSON_VOLATILE(Member) const_cast<typename std::decay<decltype(value_type::Member)>::type&>(obj.Member)
 #else
 #define RAPIDJSON_VOLATILE(Member) obj.Member
 #endif
@@ -262,25 +262,25 @@
 
 #define RAPIDJSON_ALL_MEMBER_AS(P0, P2, P3, Member, Count) RAPIDJSON_ALL_MEMBER_AS_LAST(P0, P2, P3, Member, Count)
 #define RAPIDJSON_ALL_MEMBER_AS_LAST(P0, P2, P3, Member, Count) \
-    obj.Member = json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check);
+    obj.Member = json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check);
 
 #define RAPIDJSON_N_MEMBER_AS(P0, P2, P3, Member, Count) RAPIDJSON_N_MEMBER_AS_LAST(P0, P2, P3, Member, Count)
-#define RAPIDJSON_N_MEMBER_AS_LAST(P0, P2, P3, Member, Count)                                                                              \
-    if ((num_params - Count) < num_mandatory_params || json.HasMember(macro_names::Member##_str))                                          \
-    {                                                                                                                                      \
-        obj.Member = json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check); \
+#define RAPIDJSON_N_MEMBER_AS_LAST(P0, P2, P3, Member, Count)                                                                                       \
+    if ((num_params - Count) < num_mandatory_params || json.HasMember(macro_names::Member##_str))                                                   \
+    {                                                                                                                                               \
+        obj.Member = json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check); \
     }
 
 #define RAPIDJSON_MEMBER_TO_JSON(P0, P2, P3, Member, Count) RAPIDJSON_MEMBER_TO_JSON_LAST(P0, P2, P3, Member, Count)
 #define RAPIDJSON_MEMBER_TO_JSON_LAST(P0, P2, P3, Member, Count) \
     json.AddMember(                                              \
         rapidjson::StringRef(macro_names::Member##_str),         \
-        json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::to_json(obj.Member, alloc), alloc);
+        json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::to_json(obj.Member, alloc), alloc);
 
 #define RAPIDJSON_MEMBER_TO_STREAM(P0, P2, P3, Member, Count) RAPIDJSON_MEMBER_TO_STREAM_LAST(P0, P2, P3, Member, Count)
 #define RAPIDJSON_MEMBER_TO_STREAM_LAST(P0, P2, P3, Member, Count) \
     stream.String(macro_names::Member##_str);                      \
-    json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::to_stream(stream, obj.Member);
+    json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::to_stream(stream, obj.Member);
 
 #define RAPIDJSON_MEMBER_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, NumMandatoryParams, ...)                      \
     namespace rapidjson_macros                                                                                             \
@@ -359,14 +359,14 @@
 #define RAPIDJSON_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_ALL_MEMBER_NAME_AS_ Seq
 #define RAPIDJSON_ALL_MEMBER_NAME_AS_(Member, Name) \
-    obj.Member = json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check);
+    obj.Member = json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check);
 
 #define RAPIDJSON_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params - Count) < num_mandatory_params || RAPIDJSON_N_MEMBER_NAME_AS_ Seq
-#define RAPIDJSON_N_MEMBER_NAME_AS_(Member, Name)                                                                                          \
-    json.HasMember(macro_names::Member##_str))                                                                                             \
-    {                                                                                                                                      \
-        obj.Member = json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check); \
+#define RAPIDJSON_N_MEMBER_NAME_AS_(Member, Name)                                                                                                   \
+    json.HasMember(macro_names::Member##_str))                                                                                                      \
+    {                                                                                                                                               \
+        obj.Member = json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::as(json[macro_names::Member##_str], do_check); \
     }
 // TODO json.HasMember(RAPIDJSON_STR_LITERAL(Name)))
 #define RAPIDJSON_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) RAPIDJSON_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
@@ -374,13 +374,13 @@
 #define RAPIDJSON_MEMBER_NAME_TO_JSON_(Member, Name)     \
     json.AddMember(                                      \
         rapidjson::StringRef(macro_names::Member##_str), \
-        json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::to_json(obj.Member, alloc), alloc);
+        json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::to_json(obj.Member, alloc), alloc);
 
 #define RAPIDJSON_MEMBER_NAME_TO_STREAM(P1, P2, P3, Seq, Count) RAPIDJSON_MEMBER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_MEMBER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_MEMBER_NAME_TO_STREAM_ Seq
 #define RAPIDJSON_MEMBER_NAME_TO_STREAM_(Member, Name) \
     stream.String(macro_names::Member##_str);          \
-    json_type_traits<std::decay<decltype(value_type::Member)>::type, Enc>::to_stream(stream, obj.Member);
+    json_type_traits<typename std::decay<decltype(value_type::Member)>::type, Enc>::to_stream(stream, obj.Member);
 
 #define RAPIDJSON_MEMBER_NAME_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, NumMandatoryParams, ...)                           \
     namespace rapidjson_macros                                                                                                       \
@@ -456,25 +456,25 @@
 
 #define RAPIDJSON_ALL_CTOR_GETTER_AS(P0, P2, Prefix, Getter, Count) RAPIDJSON_ALL_CTOR_GETTER_AS_LAST(P0, P2, Prefix, Getter, Count) RAPIDJSON_COMMA
 #define RAPIDJSON_ALL_CTOR_GETTER_AS_LAST(P0, P2, Prefix, Getter, Count) \
-    json_type_traits<std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::as(json[macro_names::Prefix##Getter##_str], do_check)
+    json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::as(json[macro_names::Prefix##Getter##_str], do_check)
 
 #define RAPIDJSON_N_CTOR_GETTER_AS(P0, P2, Prefix, Getter, Count) RAPIDJSON_N_CTOR_GETTER_AS_LAST(P0, P2, Prefix, Getter, Count) RAPIDJSON_COMMA
-#define RAPIDJSON_N_CTOR_GETTER_AS_LAST(P0, P2, Prefix, Getter, Count)                                  \
-    ((num_params - Count) < num_mandatory_params || json.HasMember(macro_names::Prefix##Getter##_str))  \
-        ? json_type_traits<std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, \
-                           Enc>::as(json[macro_names::Prefix##Getter##_str], do_check)                  \
-        : std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type()
+#define RAPIDJSON_N_CTOR_GETTER_AS_LAST(P0, P2, Prefix, Getter, Count)                                           \
+    ((num_params - Count) < num_mandatory_params || json.HasMember(macro_names::Prefix##Getter##_str))           \
+        ? json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, \
+                           Enc>::as(json[macro_names::Prefix##Getter##_str], do_check)                           \
+        : typename std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type()
 
 #define RAPIDJSON_CTOR_GETTER_TO_JSON(P0, P2, Prefix, Getter, Count) RAPIDJSON_CTOR_GETTER_TO_JSON_LAST(P0, P2, Prefix, Getter, Count)
 #define RAPIDJSON_CTOR_GETTER_TO_JSON_LAST(P0, P2, Prefix, Getter, Count) \
     json.AddMember(                                                       \
         rapidjson::StringRef(macro_names::Prefix##Getter##_str),          \
-        json_type_traits<std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::to_json(obj.Prefix##Getter(), alloc), alloc);
+        json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::to_json(obj.Prefix##Getter(), alloc), alloc);
 
 #define RAPIDJSON_CTOR_GETTER_TO_STREAM(P0, P2, Prefix, Getter, Count) RAPIDJSON_CTOR_GETTER_TO_STREAM_LAST(P0, P2, Prefix, Getter, Count)
 #define RAPIDJSON_CTOR_GETTER_TO_STREAM_LAST(P0, P2, Prefix, Getter, Count) \
     stream.String(macro_names::Prefix##Getter##_str);                       \
-    json_type_traits<std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::to_stream(stream, obj.Prefix##Getter());
+    json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Prefix##Getter())>::type, Enc>::to_stream(stream, obj.Prefix##Getter());
 
 #define RAPIDJSON_CTOR_GETTER_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, Prefix, NumMandatoryParams, ...)         \
     namespace rapidjson_macros                                                                                             \
@@ -549,27 +549,27 @@
 #define RAPIDJSON_ALL_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_ALL_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_COMMA
 #define RAPIDJSON_ALL_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_ALL_CTOR_GETTER_NAME_AS_ Seq)
 #define RAPIDJSON_ALL_CTOR_GETTER_NAME_AS_(Getter, Name) \
-    json_type_traits<std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check)
+    json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check)
 
 #define RAPIDJSON_N_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_N_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_COMMA
 #define RAPIDJSON_N_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) ((num_params-Count) < num_mandatory_params || RAPIDJSON_EXPAND(RAPIDJSON_N_CTOR_GETTER_NAME_AS_ Seq)
-#define RAPIDJSON_N_CTOR_GETTER_NAME_AS_(Getter, Name)                                                                                              \
+#define RAPIDJSON_N_CTOR_GETTER_NAME_AS_(Getter, Name)                                                                                                       \
     json.HasMember(macro_names::Getter##_str))                                                                                                \
-        ? json_type_traits<std::decay<decltype((std::declval<value_type *>())->Getter())>::type, Enc>::as(json[macro_names::Getter##_str],do_check) \
-        : std::decay<decltype((std::declval<value_type *>())->Getter())>::type()
+        ? json_type_traits<typename std::decay<decltype((std::declval<value_type *>())->Getter())>::type, Enc>::as(json[macro_names::Getter##_str],do_check) \
+        : typename std::decay<decltype((std::declval<value_type *>())->Getter())>::type()
 
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) RAPIDJSON_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_CTOR_GETTER_NAME_TO_JSON_ Seq)
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_JSON_(Getter, Name) \
     json.AddMember(                                       \
         rapidjson::StringRef(macro_names::Getter##_str),  \
-        json_type_traits<std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
+        json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
 
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_STREAM(P1, P2, P3, Seq, Count) RAPIDJSON_CTOR_GETTER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_CTOR_GETTER_NAME_TO_STREAM_ Seq)
 #define RAPIDJSON_CTOR_GETTER_NAME_TO_STREAM_(Getter, Name) \
     stream.String(macro_names::Getter##_str);               \
-    json_type_traits<std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::to_stream(stream, obj.Getter());
+    json_type_traits<typename std::decay<decltype((std::declval<value_type*>())->Getter())>::type, Enc>::to_stream(stream, obj.Getter());
 
 #define RAPIDJSON_CTOR_GETTER_NAME_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, NumMandatoryParams, ...)                      \
     namespace rapidjson_macros                                                                                                       \
@@ -634,7 +634,7 @@
 #define RAPIDJSON_ALL_GETTER_SETTER_AS(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_ALL_GETTER_SETTER_AS_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
 #define RAPIDJSON_ALL_GETTER_SETTER_AS_LAST(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_ALL_GETTER_SETTER_AS_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
 #define RAPIDJSON_ALL_GETTER_SETTER_AS_(P0, Getter, Setter, Property, Count) \
-    obj.Setter(json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Property##_str], do_check));
+    obj.Setter(json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Property##_str], do_check));
 
 #define RAPIDJSON_N_GETTER_SETTER_AS(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_N_GETTER_SETTER_AS_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
 #define RAPIDJSON_N_GETTER_SETTER_AS_LAST(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_N_GETTER_SETTER_AS_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
@@ -649,13 +649,13 @@
 #define RAPIDJSON_GETTER_SETTER_TO_JSON_(P0, Getter, Setter, Property, Count) \
     json.AddMember(                                                           \
         rapidjson::StringRef(macro_names::Property##_str),                    \
-        json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
+        json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
 
 #define RAPIDJSON_GETTER_SETTER_TO_STREAM(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_GETTER_SETTER_TO_STREAM_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
 #define RAPIDJSON_GETTER_SETTER_TO_STREAM_LAST(P0, GetPrefix, SetPrefix, Property, Count) RAPIDJSON_GETTER_SETTER_TO_STREAM_(P0, GetPrefix##Property, SetPrefix##Property, Property, Count)
 #define RAPIDJSON_GETTER_SETTER_TO_STREAM_(P0, Getter, Setter, Property, Count) \
     stream.String(macro_names::Property##_str);                                 \
-    json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::to_stream(stream, obj.Getter());
+    json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::to_stream(stream, obj.Getter());
 
 #define RAPIDJSON_GETTER_SETTER_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, GetPrefix, SetPrefix, NumMandatoryParams, ...) \
     namespace rapidjson_macros                                                                                                     \
@@ -732,25 +732,25 @@
 #define RAPIDJSON_ALL_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_ALL_GETTER_SETTER_NAME_AS_ Seq)
 #define RAPIDJSON_ALL_GETTER_SETTER_NAME_AS_(Getter, Setter, Name) \
-    obj.Setter(json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check));
+    obj.Setter(json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check));
 
 #define RAPIDJSON_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) RAPIDJSON_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params || RAPIDJSON_EXPAND(RAPIDJSON_N_GETTER_SETTER_NAME_AS_ Seq)
 #define RAPIDJSON_N_GETTER_SETTER_NAME_AS_(Getter, Setter, Name) json.HasMember(macro_names::Getter##_str)) \
-    obj.Setter(json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check));
+    obj.Setter(json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::as(json[macro_names::Getter##_str], do_check));
 
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) RAPIDJSON_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_GETTER_SETTER_NAME_TO_JSON_ Seq)
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_JSON_(Getter, Setter, Name) \
     json.AddMember(                                                 \
         rapidjson::StringRef(macro_names::Getter##_str),            \
-        json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
+        json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::to_json(obj.Getter(), alloc), alloc);
 
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_STREAM(P1, P2, P3, Seq, Count) RAPIDJSON_GETTER_SETTER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count)
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_STREAM_LAST(P1, P2, P3, Seq, Count) RAPIDJSON_EXPAND(RAPIDJSON_GETTER_SETTER_NAME_TO_STREAM_ Seq)
 #define RAPIDJSON_GETTER_SETTER_NAME_TO_STREAM_(Getter, Setter, Name) \
     stream.String(macro_names::Getter##_str);                         \
-    json_type_traits<std::decay<decltype(obj.Getter())>::type, Enc>::to_stream(stream, obj.Getter());
+    json_type_traits<typename std::decay<decltype(obj.Getter())>::type, Enc>::to_stream(stream, obj.Getter());
 
 #define RAPIDJSON_GETTER_SETTER_NAME_TRAITS_BASE(IsT, AsT, NumTemplateParams, ValueType, NumMandatoryParams, ...)                           \
     namespace rapidjson_macros                                                                                                              \

@@ -46,8 +46,8 @@ namespace rapidjson_macros
     template <class T, typename SrcEnc = rapidjson::UTF8<>, typename TgtEnc = SrcEnc, typename SAlloc = rapidjson::CrtAllocator, unsigned Flags = rapidjson::kWriteDefaultFlags>
     static void to_stream(std::basic_ostream<typename SrcEnc::Ch>& stream, const T& obj)
     {
-        rapidjson::BasicOStreamWrapper<std::basic_ostream<SrcEnc::Ch>> osw(stream);
-        rapidjson::Writer<rapidjson::BasicOStreamWrapper<std::basic_ostream<SrcEnc::Ch>>, SrcEnc, TgtEnc, SAlloc, Flags> w(osw);
+        rapidjson::BasicOStreamWrapper<std::basic_ostream<typename SrcEnc::Ch>> osw(stream);
+        rapidjson::Writer<rapidjson::BasicOStreamWrapper<std::basic_ostream<typename SrcEnc::Ch>>, SrcEnc, TgtEnc, SAlloc, Flags> w(osw);
 
         json_type_traits<T, SrcEnc>::to_stream(w, obj);
     }

@@ -18,8 +18,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
     {
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::as",
-            [&](int)
-            {
+            [&](int) {
                 return as<all_member_trait_class>(
                     R"(
                         {
@@ -48,8 +47,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
 
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::as",
-            [&](int)
-            {
+            [&](int) {
                 rapidjson::Document doc;
                 return to_json<all_member_trait_class>(val, doc.GetAllocator());
             });
@@ -67,8 +65,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
 
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::to_stream",
-            [&](int)
-            {
+            [&](int) {
                 std::stringstream ss;
                 to_stream<all_member_trait_class>(ss, val);
                 return ss.str();

@@ -13,12 +13,12 @@ namespace rapidjson_macros
     template <typename Enc>
     struct json_type_traits<all_member_trait_class, Enc>
     {
-        static constexpr char* my_bool_str = "my_bool";
-        static constexpr char* my_int32_str = "my_int32";
-        static constexpr char* my_int64_str = "my_int64";
-        static constexpr char* my_string_str = "my_string";
-        static constexpr char* my_vector_str = "my_vector";
-        static constexpr char* my_map_str = "my_map";
+        static constexpr const char* my_bool_str = "my_bool";
+        static constexpr const char* my_int32_str = "my_int32";
+        static constexpr const char* my_int64_str = "my_int64";
+        static constexpr const char* my_string_str = "my_string";
+        static constexpr const char* my_vector_str = "my_vector";
+        static constexpr const char* my_map_str = "my_map";
         using value_type = all_member_trait_class;
         using alloc_type = typename rapidjson::GenericDocument<Enc>::AllocatorType;
         using char_type = char;
@@ -34,7 +34,7 @@ namespace rapidjson_macros
 
             for (auto& e : json[my_map_str].GetArray())
             {
-                auto& e_array = e.GetArray();
+                auto e_array = e.GetArray();
                 obj.my_map.emplace(std::make_pair<int, double>(e_array[0].GetInt(), e_array[1].GetDouble()));
             }
 
@@ -109,8 +109,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
     {
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::as",
-            [&](int)
-            {
+            [&](int) {
                 return as<all_member_trait_class>(
                     R"(
                         {
@@ -139,8 +138,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
 
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::as",
-            [&](int)
-            {
+            [&](int) {
                 rapidjson::Document doc;
                 return to_json<all_member_trait_class>(val, doc.GetAllocator());
             });
@@ -158,8 +156,7 @@ TEST_CASE("ALL_MEMBER_TRAITS")
 
         Catch::Benchmark::Benchmark bench(
             "ALL_MEMBER_TRAITS::to_stream",
-            [&](int)
-            {
+            [&](int) {
                 std::stringstream ss;
                 to_stream<all_member_trait_class>(ss, val);
                 return ss.str();

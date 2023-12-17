@@ -1,17 +1,35 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  LLVM
-UseTab: Never
-IndentWidth: 4
-TabWidth: 4
-BreakBeforeBraces: Allman
-AllowShortIfStatementsOnASingleLine: false
-IndentCaseLabels: false
-ColumnLimit: 0
 AccessModifierOffset: -4
-NamespaceIndentation: All
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: true
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  SplitEmptyRecord: false
+ColumnLimit: 0
 FixNamespaceComments: false
+IndentCaseLabels: false
+IndentWidth: 4
+NamespaceIndentation: All
 PointerAlignment: Left
 QualifierAlignment: Left
 ReferenceAlignment: Left
 SortIncludes: Never
+TabWidth: 4
+UseTab: Never

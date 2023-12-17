@@ -9,6 +9,70 @@
 
 namespace rapidjson_macros
 {
+    namespace priv
+    {
+        template <typename CharType>
+        struct null_terminator
+        {
+            static CharType value();
+        };
+        template <>
+        struct null_terminator<char>
+        {
+            static inline char value() { return '\0'; }
+        };
+        template <>
+        struct null_terminator<wchar_t>
+        {
+            static inline wchar_t value() { return L'\0'; }
+        };
+        template <>
+        struct null_terminator<char16_t>
+        {
+            static inline char16_t value() { return u'\0'; }
+        };
+        template <>
+        struct null_terminator<char32_t>
+        {
+            static inline char32_t value() { return U'\0'; }
+        };
+        template <>
+        struct null_terminator<unsigned>
+        {
+            static inline unsigned value() { return (unsigned)U'\0'; }
+        };
+
+        template <typename CharType>
+        struct reverse_encoding
+        {
+        };
+        template <>
+        struct reverse_encoding<char>
+        {
+            using Enc = rapidjson::UTF8<char>;
+        };
+        template <>
+        struct reverse_encoding<wchar_t>
+        {
+            using Enc = rapidjson::UTF16<wchar_t>;
+        };
+        template <>
+        struct reverse_encoding<char16_t>
+        {
+            using Enc = rapidjson::UTF16<char16_t>;
+        };
+        template <>
+        struct reverse_encoding<char32_t>
+        {
+            using Enc = rapidjson::UTF32<char32_t>;
+        };
+        template <>
+        struct reverse_encoding<unsigned>
+        {
+            using Enc = rapidjson::UTF32<unsigned>;
+        };
+
+    }
     template <typename Enc>
     struct json_type_traits<bool, Enc>
     {
@@ -213,67 +277,6 @@ namespace rapidjson_macros
         }
     };
 
-    template <typename CharType>
-    struct null_terminator
-    {
-        static CharType value() = 0;
-    };
-    template <>
-    struct null_terminator<char>
-    {
-        static inline char value() { return '\0'; }
-    };
-    template <>
-    struct null_terminator<wchar_t>
-    {
-        static inline wchar_t value() { return L'\0'; }
-    };
-    template <>
-    struct null_terminator<char16_t>
-    {
-        static inline char16_t value() { return u'\0'; }
-    };
-    template <>
-    struct null_terminator<char32_t>
-    {
-        static inline char32_t value() { return U'\0'; }
-    };
-    template <>
-    struct null_terminator<unsigned>
-    {
-        static inline unsigned value() { return (unsigned)U'\0'; }
-    };
-
-    template <typename CharType>
-    struct reverse_encoding
-    {
-    };
-    template <>
-    struct reverse_encoding<char>
-    {
-        using Enc = rapidjson::UTF8<char>;
-    };
-    template <>
-    struct reverse_encoding<wchar_t>
-    {
-        using Enc = rapidjson::UTF16<wchar_t>;
-    };
-    template <>
-    struct reverse_encoding<char16_t>
-    {
-        using Enc = rapidjson::UTF16<char16_t>;
-    };
-    template <>
-    struct reverse_encoding<char32_t>
-    {
-        using Enc = rapidjson::UTF32<char32_t>;
-    };
-    template <>
-    struct reverse_encoding<unsigned>
-    {
-        using Enc = rapidjson::UTF32<unsigned>;
-    };
-
     // Same encoding, no transcoder
     template <typename T, typename Enc>
     struct json_type_traits<const T*,
@@ -300,7 +303,7 @@ namespace rapidjson_macros
             auto len = json.GetStringLength();
             T* temp = static_cast<T*>(malloc(sizeof(T) * len + 1));
             std::memcpy(temp, json.GetString(), len);
-            temp[len] = null_terminator<Enc::Ch>::value();
+            temp[len] = priv::null_terminator<typename Enc::Ch>::value();
 
             return temp;
         }
@@ -342,22 +345,22 @@ namespace rapidjson_macros
             T* temp = static_cast<T*>(malloc(sizeof(T) * len + 1));
 
             rapidjson::GenericStringStream<Enc> source(json.GetString());
-            rapidjson::ReadWriteStringStream<reverse_encoding<T>::Enc> target(temp);
+            rapidjson::ReadWriteStringStream<typename priv::reverse_encoding<T>::Enc> target(temp);
 
-            while (source.Peek() != null_terminator<Enc::Ch>::value())
-                rapidjson::Transcoder<Enc, reverse_encoding<T>::Enc>::Transcode(source, target);
+            while (source.Peek() != priv::null_terminator<typename Enc::Ch>::value())
+                rapidjson::Transcoder<Enc, typename priv::reverse_encoding<T>::Enc>::Transcode(source, target);
 
-            temp[len] = null_terminator<T>::value();
+            temp[len] = priv::null_terminator<T>::value();
 
             return temp;
         }
         static inline rapidjson::GenericValue<Enc> to_json(const value_type obj, alloc_type& alloc = alloc_type())
         {
-            rapidjson::GenericStringStream<reverse_encoding<T>::Enc> source(obj);
+            rapidjson::GenericStringStream<typename priv::reverse_encoding<T>::Enc> source(obj);
             rapidjson::GenericStringBuffer<Enc> target;
 
-            while (source.Peek() != null_terminator<Enc::Ch>::value())
-                rapidjson::Transcoder<reverse_encoding<T>::Enc, Enc>::Transcode(source, target);
+            while (source.Peek() != priv::null_terminator<typename Enc::Ch>::value())
+                rapidjson::Transcoder<typename priv::reverse_encoding<T>::Enc, Enc>::Transcode(source, target);
 
             return rapidjson::GenericValue<Enc>(target.GetString(), alloc);
         }
@@ -367,8 +370,8 @@ namespace rapidjson_macros
             rapidjson::GenericStringStream<rapidjson::UTF8<>> source(obj);
             rapidjson::GenericStringBuffer<Enc> target;
 
-            while (source.Peek() != null_terminator<Enc::Ch>::value())
-                rapidjson::Transcoder<reverse_encoding<T>::Enc, Enc>::Transcode(source, target);
+            while (source.Peek() != priv::null_terminator<typename Enc::Ch>::value())
+                rapidjson::Transcoder<typename priv::reverse_encoding<T>::Enc, Enc>::Transcode(source, target);
 
             stream.String(target.GetString());
         }
@@ -379,7 +382,7 @@ namespace rapidjson_macros
     {
         bool operator()(const CharType* s1, const CharType* s2) const
         {
-            CharType null_char = null_terminator<CharType>::value();
+            CharType null_char = priv::null_terminator<CharType>::value();
             while (*s1 != null_char && (*s1 == *s2))
                 s1++, s2++;
             return *s1 < *s2;
@@ -401,7 +404,7 @@ namespace rapidjson_macros
             if (do_check && !is(json))
                 throw std::runtime_error("Not std::pair");
 
-            auto& array = json.GetArray();
+            auto array = json.GetArray();
             return std::make_pair<T1, T2>(
                 json_type_traits<T1, Enc>::as(array[0], do_check),
                 json_type_traits<T2, Enc>::as(array[1], do_check));

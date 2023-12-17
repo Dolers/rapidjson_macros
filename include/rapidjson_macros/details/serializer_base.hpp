@@ -5,6 +5,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/ostreamwrapper.h>
+#include <stdexcept>
 
 namespace rapidjson_macros
 {
@@ -17,22 +18,26 @@ namespace rapidjson_macros
         static bool is(const rapidjson::GenericValue<Enc>& json) noexcept
         {
             static_assert(!std::is_same<T, T>::value, "json_type_traits::is is not implemented. Might be missing macro for type T");
+            throw std::invalid_argument("json_type_traits::is is not implemented. Might be missing macro for type T");
         }
 
         static T as(const rapidjson::GenericValue<Enc>&, const bool& do_check)
         {
             static_assert(!std::is_same<T, T>::value, "json_type_traits::as<Enc> is not implemented. Might be missing macro for type T");
+            throw std::invalid_argument("json_type_traits::as<Enc> is not implemented. Might be missing macro for type T");
         }
 
         static rapidjson::GenericValue<Enc> to_json(const T&, typename rapidjson::GenericDocument<Enc>::AllocatorType&)
         {
             static_assert(!std::is_same<T, T>::value, "json_type_traits::to_json<Enc> is not implemented. Might be missing macro for type T");
+            throw std::invalid_argument("json_type_traits::to_json<Enc> is not implemented. Might be missing macro for type T");
         }
 
         template <typename OStr, typename TgtEnc, typename SAlloc, unsigned Flags>
         static void to_stream(rapidjson::Writer<OStr, Enc, TgtEnc, SAlloc, Flags>& stream, const T&)
         {
             static_assert(!std::is_same<T, T>::value, "json_type_traits::to_stream is not implemented. Might be missing macro for type T");
+            throw std::invalid_argument("json_type_traits::to_stream is not implemented. Might be missing macro for type T");
         }
     };
     template <typename T, typename Enc>

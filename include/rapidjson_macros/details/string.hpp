@@ -60,7 +60,7 @@ namespace rapidjson_macros
             rapidjson::GenericStringStream<Enc> source(json.GetString());
             rapidjson::GenericStringBuffer<rapidjson::UTF8<>> target;
 
-            while (source.Peek() != null_terminator<Enc::Ch>::value())
+            while (source.Peek() != priv::null_terminator<typename Enc::Ch>::value())
                 rapidjson::Transcoder<Enc, rapidjson::UTF8<>>::Transcode(source, target);
 
             return target.GetString();
@@ -111,8 +111,7 @@ namespace rapidjson_macros
             rapidjson::GenericStringStream<Enc> source(json.GetString());
             rapidjson::GenericStringBuffer<rapidjson::UTF16<>> target;
 
-            while (source.Peek() != null_terminator<Enc::Ch>::value())
-                rapidjson::Transcoder<Enc, rapidjson::UTF16<>>::Transcode(source, target);
+            rapidjson::Transcoder<Enc, rapidjson::UTF16<>>::Transcode(source, target);
 
             return target.GetString();
         }
@@ -124,8 +123,7 @@ namespace rapidjson_macros
             rapidjson::GenericStringBuffer<rapidjson::UTF16<>> source(obj);
             rapidjson::GenericStringBuffer<Enc> target;
 
-            while (source.Peek() != null_terminator<rapidjson::UTF8<>::Ch>::value())
-                rapidjson::Transcoder<rapidjson::UTF16<>, Enc>::Transcode(source, target);
+            rapidjson::Transcoder<rapidjson::UTF16<>, Enc>::Transcode(source, target);
 
             return rapidjson::GenericValue<Enc>(target.GetString(), alloc);
         }
@@ -138,8 +136,7 @@ namespace rapidjson_macros
             rapidjson::GenericStringBuffer<rapidjson::UTF16<>> source(obj);
             rapidjson::GenericStringBuffer<Enc> target;
 
-            while (source.Peek() != null_terminator<rapidjson::UTF8<>::Ch>::value())
-                rapidjson::Transcoder<rapidjson::UTF16<>, Enc>::Transcode(source, target);
+            rapidjson::Transcoder<rapidjson::UTF16<>, Enc>::Transcode(source, target);
 
             stream.String(target.GetString());
         }
